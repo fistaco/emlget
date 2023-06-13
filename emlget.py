@@ -12,10 +12,15 @@ def download_eml_zips(base_url, destination_dir=None):
     Downloads the all EML ZIPs corresponding to the given `base_url` and places
     them in the given `destination_dir`.
     """
+    # Generate the destination directory's name if the user doesn't provide one
     election_name = base_url.split("_")[-1]
     if destination_dir is None:
         current_dirpath = pathlib.Path().resolve()
         destination_dir = os.path.join(current_dirpath, election_name)
+
+    # Create the destination directory if necessary
+    if not os.path.isdir(destination_dir):
+        os.mkdir(destination_dir)
 
     urls = [f"{base_url}_deel_{i}" for i in range(1, 4)]
     # Find all hosted ZIP files and download them
