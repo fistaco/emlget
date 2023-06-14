@@ -107,6 +107,8 @@ def merge_subdirectories(main_dir):
                         eml_file_abspath,
                         os.path.join(new_subdir, eml_filename)
                     )
+
+                remove_directory(filepath_abs)  # Dir should be empty now
             # Move normal files directly to main_dir
             else:
                 dest = os.path.join(main_dir, filename)
@@ -115,10 +117,7 @@ def merge_subdirectories(main_dir):
                 os.rename(filepath_abs, dest)
 
         # Remove the subdirectory, as it should now be empty
-        try:
-            os.rmdir(subdir_abs)
-        except OSError:
-            print(f"[!] Could not delete directory {subdir} because it is not empty.")
+        remove_directory(subdir_abs)
 
 
 def url_exists(url):
@@ -141,6 +140,18 @@ def file_is_zipfile(filename):
     extension.
     """
     return os.path.splitext(filename)[1] == ".zip"
+
+
+def remove_directory(dir_abspath):
+    """
+    Removes the given directory if it is empty and logs whether the removal was
+    successful.
+    """
+    try:
+        os.rmdir(dir_abspath)
+        print(f"[*] Deleted redundant directory {dir_abspath}")
+    except OSError:
+        print(f"[!] Could not delete directory {dir_abspath} because it is not empty.")
 
 
 def parse_args():
