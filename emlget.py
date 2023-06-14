@@ -68,6 +68,53 @@ def delete_zips(zips_dir):
             os.remove(os.path.join(zips_dir, filename))
 
 
+def merge_subdirectories(main_dir):
+    """
+    Merges all the subdirectories in `main_dir` that may have been extracted
+    from the segmented ZIP files, e.g., merge the contents of directories
+    "EML_bestanden_TK2021_deel_1", "EML_bestanden_TK2021_deel_2", and
+    "EML_bestanden_TK2021_deel_3".
+
+    Note that, in order to avoid merging irrelevant directories, this method
+    will only merge directories with names that start with "EML" and end with a
+    digit.
+    """
+    main_dir_abs = os.path.abspath(main_dir)
+    subdirs = next(os.walk(main_dir))[1]
+    print(f"Found subdirectories: {', '.join(subdirs)}")
+
+    # Find all subsubdirectories with matching names, move their files to a
+    # new, unifying subsubdirectory, and place that dir in the main subdir.
+    for subdir in subdirs:  # Iterates over "EML_bestanden_..._i"
+        subdir_abs = os.path.join(main_dir_abs, subdir)
+        print(f"[*] Moving files from {subdir}")
+
+        files = os.listdir(subdir_abs)
+        for filename in files:
+            filepath_abs = os.path.join(subdir_abs, filename)  # Can be a dir
+
+            # Move/merge all subsubdirectory contents
+            if os.path.isdir(filepath_abs):  # Likely constituency/municipality
+                new_subdir = os.path.join(main_dir_abs, filename)
+                print(f"[*] Moving files from {filepath_abs} to {new_subdir}")
+
+                if not os.path.exists(new_subdir):
+                    os.mkdir(new_subdir)
+
+                for eml_filename in os.listdir(filepath_abs):
+                    eml_file_abspath = os.path.join(filepath_abs, eml_filename)
+                    os.rename(
+                        eml_file_abspath,
+                        os.path.join(new_subdir, eml_filename)
+                    )
+            # Move normal files directly to main_dir
+            else:
+                dest = os.path.join(main_dir, filename)
+                print(f"[*] Moving {filepath_abs} to {dest}")
+
+                os.rename(filepath_abs, dest)
+
+
 def url_exists(url):
     """
     Determines and reports whether the given `url` exists by checking the HTTP
@@ -115,3 +162,5 @@ if __name__ == "__main__":
     download_eml_zips(args.base_url, args.destination_dir)
     unzip_eml_zips(args.destination_dir)
     delete_zips(args.destination_dir)
+    if not args.segregate_dirs:
+        merge_subdirectories(args.destination_dir)
