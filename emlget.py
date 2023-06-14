@@ -114,6 +114,12 @@ def merge_subdirectories(main_dir):
 
                 os.rename(filepath_abs, dest)
 
+        # Remove the subdirectory, as it should now be empty
+        try:
+            os.rmdir(subdir_abs)
+        except OSError:
+            print(f"[!] Could not delete directory {subdir} because it is not empty.")
+
 
 def url_exists(url):
     """
