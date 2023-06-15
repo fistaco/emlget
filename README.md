@@ -21,7 +21,7 @@ options:
   -s, --segregate_dirs  If set, the "EML_bestanden_deel_n" subdirectories will not be
                         merged. 
 ```
-EmlGet's current implementation requires specification of the base URL from which the ZIP files are downloaded. For instance, if you would like to obtain the files from [the AB2023 election data sources page](https://data.overheid.nl/dataset/verkiezingsuitslagen-waterschappen-2023n), you could execute the following command:
+EmlGet's current implementation requires specification of the base URL from which the ZIP files are downloaded. For instance, if you would like to obtain the files from [the AB2023 election data sources page](https://data.overheid.nl/dataset/verkiezingsuitslagen-waterschappen-2023), you could execute the following command:
 ```
 python emlget.py https://data.overheid.nl/sites/default/files/dataset/ee19bcda-0282-44a6-a464-44738afd755c/resources/EML_bestanden_AB2023 -d ab2023
 ```
