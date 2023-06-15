@@ -12,11 +12,7 @@ def download_eml_zips(base_url, destination_dir=None):
     Downloads the all EML ZIPs corresponding to the given `base_url` and places
     them in the given `destination_dir`.
     """
-    # Generate the destination directory's name if the user doesn't provide one
     election_name = base_url.split("_")[-1]
-    if destination_dir is None:
-        current_dirpath = pathlib.Path().resolve()
-        destination_dir = os.path.join(current_dirpath, election_name)
 
     # Create the destination directory if necessary
     if not os.path.isdir(destination_dir):
@@ -120,6 +116,17 @@ def merge_subdirectories(main_dir):
         remove_directory(subdir_abs)
 
 
+def construct_destination_dir(base_url):
+    """
+    Uses the given `base_url` to construct an absolute path for a directory in
+    which downloaded files will be stored.
+    """
+    election_name = base_url.split("_")[-1]
+    current_dirpath = pathlib.Path().resolve()
+
+    return os.path.join(current_dirpath, election_name)
+
+
 def url_exists(url):
     """
     Determines and reports whether the given `url` exists by checking the HTTP
@@ -175,9 +182,12 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    
-    download_eml_zips(args.base_url, args.destination_dir)
-    unzip_eml_zips(args.destination_dir)
-    delete_zips(args.destination_dir)
+
+    dest_dir = args.destination_dir if args.destination_dir is not None \
+        else construct_destination_dir(args.base_url)
+
+    download_eml_zips(args.base_url, dest_dir)
+    unzip_eml_zips(dest_dir)
+    delete_zips(dest_dir)
     if not args.segregate_dirs:
-        merge_subdirectories(args.destination_dir)
+        merge_subdirectories(dest_dir)
